@@ -41,62 +41,33 @@ using namespace mythtitans::exprl::util;
 
 namespace mythtitans::exprl::parser {
 
-    enum class ExpressionSwitch {
-        NOT_EXPRESSION,
-        AND_EXPRESSION,
-        OR_EXPRESSION,
-        ADD_EXPRESSION,
-        SUB_EXPRESSION,
-        MUL_EXPRESSION,
-        DIV_EXPRESSION,
-        MOD_EXPRESSION,
-        STARTS_EXPRESSION,
-        ENDS_EXPRESSION,
-        IN_EXPRESSION,
-        SUBSTR_EXPRESSION,
-        SUBSTRL_EXPRESSION,
-        LEN_EXPRESSION,
-        EQ_EXPRESSION,
-        NEQ_EXPRESSION,
-        LT_EXPRESSION,
-        LTE_EXPRESSION,
-        GT_EXPRESSION,
-        GTE_EXPRESSION,
-        MIN_EXPRESSION,
-        MAX_EXPRESSION,
-        VAR_EXPRESSION,
-        COND_EXPRESSION,
-        CONCAT_EXPRESSION,
-        DEBUG_EXPRESSION
-    };
-
-    static const std::unordered_map<std::string, ExpressionSwitch> SWITCH_MAP = {
-            {NOT_EXPRESSION,     ExpressionSwitch::NOT_EXPRESSION},
-            {AND_EXPRESSION,     ExpressionSwitch::AND_EXPRESSION},
-            {OR_EXPRESSION,      ExpressionSwitch::OR_EXPRESSION},
-            {ADD_EXPRESSION,     ExpressionSwitch::ADD_EXPRESSION},
-            {SUB_EXPRESSION,     ExpressionSwitch::SUB_EXPRESSION},
-            {MUL_EXPRESSION,     ExpressionSwitch::MUL_EXPRESSION},
-            {DIV_EXPRESSION,     ExpressionSwitch::DIV_EXPRESSION},
-            {MOD_EXPRESSION,     ExpressionSwitch::MOD_EXPRESSION},
-            {STARTS_EXPRESSION,  ExpressionSwitch::STARTS_EXPRESSION},
-            {ENDS_EXPRESSION,    ExpressionSwitch::ENDS_EXPRESSION},
-            {IN_EXPRESSION,      ExpressionSwitch::IN_EXPRESSION},
-            {SUBSTR_EXPRESSION,  ExpressionSwitch::SUBSTR_EXPRESSION},
-            {SUBSTRL_EXPRESSION, ExpressionSwitch::SUBSTRL_EXPRESSION},
-            {LEN_EXPRESSION,     ExpressionSwitch::LEN_EXPRESSION},
-            {EQ_EXPRESSION,      ExpressionSwitch::EQ_EXPRESSION},
-            {NEQ_EXPRESSION,     ExpressionSwitch::NEQ_EXPRESSION},
-            {LT_EXPRESSION,      ExpressionSwitch::LT_EXPRESSION},
-            {LTE_EXPRESSION,     ExpressionSwitch::LTE_EXPRESSION},
-            {GT_EXPRESSION,      ExpressionSwitch::GT_EXPRESSION},
-            {GTE_EXPRESSION,     ExpressionSwitch::GTE_EXPRESSION},
-            {MIN_EXPRESSION,     ExpressionSwitch::MIN_EXPRESSION},
-            {MAX_EXPRESSION,     ExpressionSwitch::MAX_EXPRESSION},
-            {VAR_EXPRESSION,     ExpressionSwitch::VAR_EXPRESSION},
-            {COND_EXPRESSION,    ExpressionSwitch::COND_EXPRESSION},
-            {CONCAT_EXPRESSION,  ExpressionSwitch::CONCAT_EXPRESSION},
-            {DEBUG_EXPRESSION,   ExpressionSwitch::DEBUG_EXPRESSION}
+    static const std::unordered_map<std::string, Parser::ExpressionSwitch> SWITCH_MAP = {
+            {NOT_EXPRESSION,     Parser::ExpressionSwitch::NOT_EXPRESSION},
+            {AND_EXPRESSION,     Parser::ExpressionSwitch::AND_EXPRESSION},
+            {OR_EXPRESSION,      Parser::ExpressionSwitch::OR_EXPRESSION},
+            {ADD_EXPRESSION,     Parser::ExpressionSwitch::ADD_EXPRESSION},
+            {SUB_EXPRESSION,     Parser::ExpressionSwitch::SUB_EXPRESSION},
+            {MUL_EXPRESSION,     Parser::ExpressionSwitch::MUL_EXPRESSION},
+            {DIV_EXPRESSION,     Parser::ExpressionSwitch::DIV_EXPRESSION},
+            {MOD_EXPRESSION,     Parser::ExpressionSwitch::MOD_EXPRESSION},
+            {STARTS_EXPRESSION,  Parser::ExpressionSwitch::STARTS_EXPRESSION},
+            {ENDS_EXPRESSION,    Parser::ExpressionSwitch::ENDS_EXPRESSION},
+            {IN_EXPRESSION,      Parser::ExpressionSwitch::IN_EXPRESSION},
+            {SUBSTR_EXPRESSION,  Parser::ExpressionSwitch::SUBSTR_EXPRESSION},
+            {SUBSTRL_EXPRESSION, Parser::ExpressionSwitch::SUBSTRL_EXPRESSION},
+            {LEN_EXPRESSION,     Parser::ExpressionSwitch::LEN_EXPRESSION},
+            {EQ_EXPRESSION,      Parser::ExpressionSwitch::EQ_EXPRESSION},
+            {NEQ_EXPRESSION,     Parser::ExpressionSwitch::NEQ_EXPRESSION},
+            {LT_EXPRESSION,      Parser::ExpressionSwitch::LT_EXPRESSION},
+            {LTE_EXPRESSION,     Parser::ExpressionSwitch::LTE_EXPRESSION},
+            {GT_EXPRESSION,      Parser::ExpressionSwitch::GT_EXPRESSION},
+            {GTE_EXPRESSION,     Parser::ExpressionSwitch::GTE_EXPRESSION},
+            {MIN_EXPRESSION,     Parser::ExpressionSwitch::MIN_EXPRESSION},
+            {MAX_EXPRESSION,     Parser::ExpressionSwitch::MAX_EXPRESSION},
+            {VAR_EXPRESSION,     Parser::ExpressionSwitch::VAR_EXPRESSION},
+            {COND_EXPRESSION,    Parser::ExpressionSwitch::COND_EXPRESSION},
+            {CONCAT_EXPRESSION,  Parser::ExpressionSwitch::CONCAT_EXPRESSION},
+            {DEBUG_EXPRESSION,   Parser::ExpressionSwitch::DEBUG_EXPRESSION}
     };
 
     static const auto DECIMAL_PATTERN = std::regex("[+-]?\\d*.\\d+");
@@ -190,19 +161,19 @@ namespace mythtitans::exprl::parser {
     std::unique_ptr<Expression> Parser::parseExpression(const std::string& expression,
                                                         std::vector<std::unique_ptr<Expression>>&& arguments) {
 
-        ExpressionSwitch expressionCase;
+        ExpressionSwitch expressionSwitch;
 
         try {
-            expressionCase = SWITCH_MAP.at(expression);
+            expressionSwitch = SWITCH_MAP.at(expression);
         } catch (std::out_of_range& e) {
             throw ParsingException("Unrecognized expression [" + expression + "].");
         }
 
-        switch (expressionCase) {
+        switch (expressionSwitch) {
             case ExpressionSwitch::NOT_EXPRESSION:
             case ExpressionSwitch::LEN_EXPRESSION:
             case ExpressionSwitch::VAR_EXPRESSION:
-                return parseUnaryExpression(expression, std::move(arguments));
+                return parseUnaryExpression(expression, expressionSwitch, std::move(arguments));
 
             case ExpressionSwitch::EQ_EXPRESSION:
             case ExpressionSwitch::NEQ_EXPRESSION:
@@ -217,7 +188,7 @@ namespace mythtitans::exprl::parser {
             case ExpressionSwitch::ENDS_EXPRESSION:
             case ExpressionSwitch::IN_EXPRESSION:
             case ExpressionSwitch::DEBUG_EXPRESSION:
-                return parseBinaryExpression(expression, std::move(arguments));
+                return parseBinaryExpression(expression, expressionSwitch, std::move(arguments));
 
             case ExpressionSwitch::AND_EXPRESSION:
             case ExpressionSwitch::OR_EXPRESSION:
@@ -226,12 +197,12 @@ namespace mythtitans::exprl::parser {
             case ExpressionSwitch::MIN_EXPRESSION:
             case ExpressionSwitch::MAX_EXPRESSION:
             case ExpressionSwitch::CONCAT_EXPRESSION:
-                return parseBiOrNaryExpression(expression, std::move(arguments));
+                return parseBiOrNaryExpression(expression, expressionSwitch, std::move(arguments));
 
             case ExpressionSwitch::SUBSTR_EXPRESSION:
             case ExpressionSwitch::SUBSTRL_EXPRESSION:
             case ExpressionSwitch::COND_EXPRESSION:
-                return parseTernaryExpression(expression, std::move(arguments));
+                return parseTernaryExpression(expression, expressionSwitch, std::move(arguments));
         }
 
         throw ParsingException("Unrecognized expression [" + expression + "].");
@@ -276,6 +247,7 @@ namespace mythtitans::exprl::parser {
     }
 
     std::unique_ptr<Expression> Parser::parseUnaryExpression(const std::string& expressionName,
+                                                             ExpressionSwitch expressionSwitch,
                                                              std::vector<std::unique_ptr<Expression>>&& arguments) {
         if (arguments.size() != 1) {
             throw ParsingException::invalidArgumentsCount(expressionName, 1, arguments.size());
@@ -283,7 +255,7 @@ namespace mythtitans::exprl::parser {
 
         auto arg = std::move(arguments[0]);
 
-        switch (SWITCH_MAP.at(expressionName)) {
+        switch (expressionSwitch) {
             case ExpressionSwitch::NOT_EXPRESSION:
                 return std::make_unique<NotExpression>(std::move(arg));
             case ExpressionSwitch::LEN_EXPRESSION:
@@ -296,6 +268,7 @@ namespace mythtitans::exprl::parser {
     }
 
     std::unique_ptr<Expression> Parser::parseBinaryExpression(const std::string& expressionName,
+                                                              ExpressionSwitch expressionSwitch,
                                                               std::vector<std::unique_ptr<Expression>>&& arguments) {
         if (arguments.size() != 2) {
             throw ParsingException::invalidArgumentsCount(expressionName, 2, arguments.size());
@@ -304,7 +277,7 @@ namespace mythtitans::exprl::parser {
         auto argA = std::move(arguments[0]);
         auto argB = std::move(arguments[1]);
 
-        switch (SWITCH_MAP.at(expressionName)) {
+        switch (expressionSwitch) {
             case ExpressionSwitch::SUB_EXPRESSION:
                 return std::make_unique<SubExpression>(std::move(argA), std::move(argB));
             case ExpressionSwitch::DIV_EXPRESSION:
@@ -337,6 +310,7 @@ namespace mythtitans::exprl::parser {
     }
 
     std::unique_ptr<Expression> Parser::parseBiOrNaryExpression(const std::string& expressionName,
+                                                                ExpressionSwitch expressionSwitch,
                                                                 std::vector<std::unique_ptr<Expression>>&& arguments) {
         if (arguments.size() < 2) {
             throw ParsingException::invalidArgumentsAtLeastCount(expressionName, 2, arguments.size());
@@ -345,7 +319,7 @@ namespace mythtitans::exprl::parser {
         std::vector<std::shared_ptr<Expression>> sharedArguments;
         std::move(arguments.begin(), arguments.end(), std::back_inserter(sharedArguments));
 
-        switch (SWITCH_MAP.at(expressionName)) {
+        switch (expressionSwitch) {
             case ExpressionSwitch::AND_EXPRESSION:
                 return std::make_unique<AndExpression>(std::move(sharedArguments));
             case ExpressionSwitch::OR_EXPRESSION:
@@ -366,6 +340,7 @@ namespace mythtitans::exprl::parser {
     }
 
     std::unique_ptr<Expression> Parser::parseTernaryExpression(const std::string& expressionName,
+                                                               ExpressionSwitch expressionSwitch,
                                                                std::vector<std::unique_ptr<Expression>>&& arguments) {
         if (arguments.size() != 3) {
             throw ParsingException::invalidArgumentsCount(expressionName, 3, arguments.size());
@@ -375,7 +350,7 @@ namespace mythtitans::exprl::parser {
         auto argB = std::move(arguments[1]);
         auto argC = std::move(arguments[2]);
 
-        switch (SWITCH_MAP.at(expressionName)) {
+        switch (expressionSwitch) {
             case ExpressionSwitch::SUBSTR_EXPRESSION:
                 return std::make_unique<SubstrExpression>(std::move(argA), std::move(argB), std::move(argC));
             case ExpressionSwitch::SUBSTRL_EXPRESSION:
