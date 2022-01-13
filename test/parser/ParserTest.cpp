@@ -281,6 +281,11 @@ TEST_CASE("Var parsing test")
     CHECK(parser.parse("var('variable-integer')")->evaluateAsInteger(context) == 1);
     CHECK(parser.parse("var('variable-decimal')")->evaluateAsDecimal(context) == Approx(1.5).epsilon(EPSILON));
     CHECK(parser.parse("var('variable-text')")->evaluateAsText(context) == "abcdef");
+
+    CHECK(parser.parse("variable-boolean")->evaluateAsBoolean(context) == true);
+    CHECK(parser.parse("variable-integer")->evaluateAsInteger(context) == 1);
+    CHECK(parser.parse("variable-decimal")->evaluateAsDecimal(context) == Approx(1.5).epsilon(EPSILON));
+    CHECK(parser.parse("variable-text")->evaluateAsText(context) == "abcdef");
 }
 
 TEST_CASE("Cond parsing test")
@@ -322,12 +327,28 @@ TEST_CASE("Complex expression parsing test")
 
     CHECK(parser.parse("len(substr('test', 0, sub(len('test'), 1)))")->evaluateAsInteger(context) == 3);
     CHECK(parser.parse("len(substr('test', add(0, 1), -1))")->evaluateAsInteger(context) == 3);
+
+    context.setVariable("variable-boolean", true);
+
+    CHECK(parser.parse("cond(and(true, variable-boolean), 'abcdef', '')")->evaluateAsText(context) == "abcdef");
+    CHECK(parser.parse("cond(and(variable-boolean, false), 'abcdef', '')")->evaluateAsText(context) == "");
 }
 
 TEST_CASE("Text literal escape parsing test")
 {
     CHECK(parser.parse("'add(1, 2)'")->evaluateAsText(context) == "add(1, 2)");
     CHECK(parser.parse("len('add(1, 2)')")->evaluateAsInteger(context) == 9);
+}
+
+TEST_CASE("Literal variable syntax test")
+{
+    CHECK_NOTHROW(parser.parse("simple"));
+    CHECK_NOTHROW(parser.parse("simple-dash"));
+    CHECK_NOTHROW(parser.parse("simple_underscore"));
+    CHECK_NOTHROW(parser.parse("composed.simple"));
+    CHECK_NOTHROW(parser.parse("composed.simple-dash"));
+    CHECK_NOTHROW(parser.parse("composed.simple_underscore"));
+    CHECK_NOTHROW(parser.parse("composed.composed.simple"));
 }
 
 TEST_CASE("Invalid expression parsing test")

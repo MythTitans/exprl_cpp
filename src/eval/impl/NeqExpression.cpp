@@ -7,8 +7,8 @@
 namespace mythtitans::exprl::eval::impl {
 
     NeqExpression::NeqExpression(std::shared_ptr<Expression> operandA, std::shared_ptr<Expression> operandB) {
-        auto eqExpression = std::make_unique<EqExpression>(std::move(operandA), std::move(operandB));
-        expression_ = std::make_unique<NotExpression>(std::move(eqExpression));
+        auto eqExpression = make_eq(std::move(operandA), std::move(operandB));
+        expression_ = make_not(std::move(eqExpression));
     }
 
     bool NeqExpression::evaluateAsBoolean(const Context& context) const {

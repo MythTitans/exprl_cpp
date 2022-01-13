@@ -84,6 +84,21 @@ static constexpr double EPSILON = 0.000001;
 
 static ExpressionEvaluator evaluator;
 
+TEST_CASE("removeME")
+{
+    ExpressionEvaluator evaluator;
+    evaluator.setVariable("state", true);
+
+    // Parse and evaluate expression
+    auto result = evaluator.evaluateAsBoolean("var('state')");
+
+    // Parse expression
+    auto parsedExpression = Parser::parse("var('state')");
+
+    // Evaluate already parsed expression
+    result = evaluator.evaluateAsBoolean(parsedExpression);
+}
+
 TEST_CASE("Evaluate raw expression")
 {
     CHECK(evaluator.evaluateAsBoolean("true") == true);

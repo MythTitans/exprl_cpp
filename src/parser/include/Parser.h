@@ -49,29 +49,29 @@ namespace mythtitans::exprl::parser {
     private:
         [[nodiscard]] static std::unique_ptr<TokenNode> buildAST(const std::string& expression);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression> parseExpression(TokenNode* ast);
+        [[nodiscard]] static std::shared_ptr<eval::Expression> parseExpression(TokenNode* ast);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression> parseExpression(const std::string& expression,
-                                                                               std::vector<std::unique_ptr<eval::Expression>>&& arguments);
+        [[nodiscard]] static std::shared_ptr<eval::Expression> parseExpression(const std::string& expression,
+                                                                               std::vector<std::shared_ptr<eval::Expression>>&& arguments);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression> parseLiteral(const std::string& expression);
+        [[nodiscard]] static std::shared_ptr<eval::Expression> parseLiteral(const std::string& expression);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression> parseUnaryExpression(const std::string& expressionName,
+        [[nodiscard]] static std::shared_ptr<eval::Expression> parseUnaryExpression(const std::string& expressionName,
                                                                                     ExpressionSwitch expressionSwitch,
-                                                                                    std::vector<std::unique_ptr<eval::Expression>>&& arguments);
+                                                                                    std::vector<std::shared_ptr<eval::Expression>>&& arguments);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression> parseBinaryExpression(const std::string& expressionName,
+        [[nodiscard]] static std::shared_ptr<eval::Expression> parseBinaryExpression(const std::string& expressionName,
                                                                                      ExpressionSwitch expressionSwitch,
-                                                                                     std::vector<std::unique_ptr<eval::Expression>>&& arguments);
+                                                                                     std::vector<std::shared_ptr<eval::Expression>>&& arguments);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression>
+        [[nodiscard]] static std::shared_ptr<eval::Expression>
         parseBiOrNaryExpression(const std::string& expressionName,
                                 ExpressionSwitch expressionSwitch,
-                                std::vector<std::unique_ptr<eval::Expression>>&& arguments);
+                                std::vector<std::shared_ptr<eval::Expression>>&& arguments);
 
-        [[nodiscard]] static std::unique_ptr<eval::Expression> parseTernaryExpression(const std::string& expressionName,
+        [[nodiscard]] static std::shared_ptr<eval::Expression> parseTernaryExpression(const std::string& expressionName,
                                                                                       ExpressionSwitch expressionSwitch,
-                                                                                      std::vector<std::unique_ptr<eval::Expression>>&& arguments);
+                                                                                      std::vector<std::shared_ptr<eval::Expression>>&& arguments);
     };
 
     class ParsingException : public std::exception {

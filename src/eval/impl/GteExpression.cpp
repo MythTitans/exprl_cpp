@@ -7,8 +7,8 @@
 namespace mythtitans::exprl::eval::impl {
 
     GteExpression::GteExpression(std::shared_ptr<Expression> operandA, std::shared_ptr<Expression> operandB) {
-        auto ltExpression = std::make_unique<LtExpression>(std::move(operandA), std::move(operandB));
-        expression_ = std::make_unique<NotExpression>(std::move(ltExpression));
+        auto ltExpression = make_lt(std::move(operandA), std::move(operandB));
+        expression_ = make_not(std::move(ltExpression));
     }
 
     bool GteExpression::evaluateAsBoolean(const Context& context) const {

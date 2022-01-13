@@ -72,6 +72,7 @@ namespace mythtitans::exprl::parser {
 
     static const auto DECIMAL_PATTERN = std::regex("[+-]?\\d*.\\d+");
     static const auto INTEGER_PATTERN = std::regex("[+-]?\\d+");
+    static const auto LITERAL_VARIABLE_PATTERN = std::regex("^[a-zA-z][\\w.-]*$");
 
     std::shared_ptr<Expression> Parser::parse(const std::string& expression) {
         auto ast = buildAST(expression);
@@ -142,10 +143,10 @@ namespace mythtitans::exprl::parser {
         return ast;
     }
 
-    std::unique_ptr<Expression> Parser::parseExpression(TokenNode* ast) {
+    std::shared_ptr<Expression> Parser::parseExpression(TokenNode* ast) {
         const auto& children = ast->getChildren();
 
-        std::vector<std::unique_ptr<Expression>> arguments;
+        std::vector<std::shared_ptr<Expression>> arguments;
 
         for (const auto& child: children) {
             arguments.push_back(parseExpression(child.get()));
@@ -158,8 +159,8 @@ namespace mythtitans::exprl::parser {
         return parseLiteral(ast->getToken());
     }
 
-    std::unique_ptr<Expression> Parser::parseExpression(const std::string& expression,
-                                                        std::vector<std::unique_ptr<Expression>>&& arguments) {
+    std::shared_ptr<Expression> Parser::parseExpression(const std::string& expression,
+                                                        std::vector<std::shared_ptr<Expression>>&& arguments) {
 
         ExpressionSwitch expressionSwitch;
 
@@ -208,7 +209,7 @@ namespace mythtitans::exprl::parser {
         throw ParsingException("Unrecognized expression [" + expression + "].");
     }
 
-    std::unique_ptr<Expression> Parser::parseLiteral(const std::string& expression) {
+    std::shared_ptr<Expression> Parser::parseLiteral(const std::string& expression) {
         bool startsAsText = starts_with(expression, "'");
         bool endsAsText = ends_with(expression, "'");
         if (startsAsText || endsAsText) {
@@ -216,19 +217,19 @@ namespace mythtitans::exprl::parser {
                 throw ParsingException("Invalid text literal [" + expression + "].");
             }
 
-            return std::make_unique<TextLiteralExpression>(expression.substr(1, expression.length() - 2));
+            return make_literal(expression.substr(1, expression.length() - 2));
         }
 
         if (expression == "true") {
-            return std::make_unique<BooleanLiteralExpression>(true);
+            return make_literal(true);
         } else if (expression == "false") {
-            return std::make_unique<BooleanLiteralExpression>(false);
+            return make_literal(false);
         }
 
         if (contains(expression, ".")) {
             if (std::regex_match(std::cbegin(expression), std::cend(expression), DECIMAL_PATTERN)) {
                 try {
-                    return std::make_unique<DecimalLiteralExpression>(std::stod(expression));
+                    return make_literal(std::stod(expression));
                 } catch (const std::invalid_argument& e) {
                     // Ignored
                 }
@@ -236,19 +237,23 @@ namespace mythtitans::exprl::parser {
         } else {
             if (std::regex_match(std::cbegin(expression), std::cend(expression), INTEGER_PATTERN)) {
                 try {
-                    return std::make_unique<IntegerLiteralExpression>(std::stol(expression));
+                    return make_literal(std::stol(expression));
                 } catch (const std::invalid_argument& e) {
                     // Ignored
                 }
             }
         }
 
+        if (std::regex_match(std::cbegin(expression), std::cend(expression), LITERAL_VARIABLE_PATTERN)) {
+            return make_var(make_literal(expression));
+        }
+
         throw ParsingException("Invalid literal [" + expression + "].");
     }
 
-    std::unique_ptr<Expression> Parser::parseUnaryExpression(const std::string& expressionName,
+    std::shared_ptr<Expression> Parser::parseUnaryExpression(const std::string& expressionName,
                                                              ExpressionSwitch expressionSwitch,
-                                                             std::vector<std::unique_ptr<Expression>>&& arguments) {
+                                                             std::vector<std::shared_ptr<Expression>>&& arguments) {
         if (arguments.size() != 1) {
             throw ParsingException::invalidArgumentsCount(expressionName, 1, arguments.size());
         }
@@ -257,19 +262,19 @@ namespace mythtitans::exprl::parser {
 
         switch (expressionSwitch) {
             case ExpressionSwitch::NOT_EXPRESSION:
-                return std::make_unique<NotExpression>(std::move(arg));
+                return make_not(std::move(arg));
             case ExpressionSwitch::LEN_EXPRESSION:
-                return std::make_unique<LenExpression>(std::move(arg));
+                return make_len(std::move(arg));
             case ExpressionSwitch::VAR_EXPRESSION:
-                return std::make_unique<VarExpression>(std::move(arg));
+                return make_var(std::move(arg));
             default:
                 throw ParsingException("Unrecognized expression [" + expressionName + "].");
         }
     }
 
-    std::unique_ptr<Expression> Parser::parseBinaryExpression(const std::string& expressionName,
+    std::shared_ptr<Expression> Parser::parseBinaryExpression(const std::string& expressionName,
                                                               ExpressionSwitch expressionSwitch,
-                                                              std::vector<std::unique_ptr<Expression>>&& arguments) {
+                                                              std::vector<std::shared_ptr<Expression>>&& arguments) {
         if (arguments.size() != 2) {
             throw ParsingException::invalidArgumentsCount(expressionName, 2, arguments.size());
         }
@@ -279,39 +284,39 @@ namespace mythtitans::exprl::parser {
 
         switch (expressionSwitch) {
             case ExpressionSwitch::SUB_EXPRESSION:
-                return std::make_unique<SubExpression>(std::move(argA), std::move(argB));
+                return make_sub(std::move(argA), std::move(argB));
             case ExpressionSwitch::DIV_EXPRESSION:
-                return std::make_unique<DivExpression>(std::move(argA), std::move(argB));
+                return make_div(std::move(argA), std::move(argB));
             case ExpressionSwitch::MOD_EXPRESSION:
-                return std::make_unique<ModExpression>(std::move(argA), std::move(argB));
+                return make_mod(std::move(argA), std::move(argB));
             case ExpressionSwitch::STARTS_EXPRESSION:
-                return std::make_unique<StartsExpression>(std::move(argA), std::move(argB));
+                return make_starts(std::move(argA), std::move(argB));
             case ExpressionSwitch::ENDS_EXPRESSION:
-                return std::make_unique<EndsExpression>(std::move(argA), std::move(argB));
+                return make_ends(std::move(argA), std::move(argB));
             case ExpressionSwitch::IN_EXPRESSION:
-                return std::make_unique<InExpression>(std::move(argA), std::move(argB));
+                return make_in(std::move(argA), std::move(argB));
             case ExpressionSwitch::EQ_EXPRESSION:
-                return std::make_unique<EqExpression>(std::move(argA), std::move(argB));
+                return make_eq(std::move(argA), std::move(argB));
             case ExpressionSwitch::NEQ_EXPRESSION:
-                return std::make_unique<NeqExpression>(std::move(argA), std::move(argB));
+                return make_neq(std::move(argA), std::move(argB));
             case ExpressionSwitch::LT_EXPRESSION:
-                return std::make_unique<LtExpression>(std::move(argA), std::move(argB));
+                return make_lt(std::move(argA), std::move(argB));
             case ExpressionSwitch::LTE_EXPRESSION:
-                return std::make_unique<LteExpression>(std::move(argA), std::move(argB));
+                return make_lte(std::move(argA), std::move(argB));
             case ExpressionSwitch::GT_EXPRESSION:
-                return std::make_unique<GtExpression>(std::move(argA), std::move(argB));
+                return make_gt(std::move(argA), std::move(argB));
             case ExpressionSwitch::GTE_EXPRESSION:
-                return std::make_unique<GteExpression>(std::move(argA), std::move(argB));
+                return make_gte(std::move(argA), std::move(argB));
             case ExpressionSwitch::DEBUG_EXPRESSION:
-                return std::make_unique<DebugExpression>(std::move(argA), std::move(argB));
+                return make_debug(std::move(argA), std::move(argB));
             default:
                 throw ParsingException("Unrecognized expression [" + expressionName + "].");
         }
     }
 
-    std::unique_ptr<Expression> Parser::parseBiOrNaryExpression(const std::string& expressionName,
+    std::shared_ptr<Expression> Parser::parseBiOrNaryExpression(const std::string& expressionName,
                                                                 ExpressionSwitch expressionSwitch,
-                                                                std::vector<std::unique_ptr<Expression>>&& arguments) {
+                                                                std::vector<std::shared_ptr<Expression>>&& arguments) {
         if (arguments.size() < 2) {
             throw ParsingException::invalidArgumentsAtLeastCount(expressionName, 2, arguments.size());
         }
@@ -321,27 +326,27 @@ namespace mythtitans::exprl::parser {
 
         switch (expressionSwitch) {
             case ExpressionSwitch::AND_EXPRESSION:
-                return std::make_unique<AndExpression>(std::move(sharedArguments));
+                return std::make_shared<AndExpression>(std::move(sharedArguments));
             case ExpressionSwitch::OR_EXPRESSION:
-                return std::make_unique<OrExpression>(std::move(sharedArguments));
+                return std::make_shared<OrExpression>(std::move(sharedArguments));
             case ExpressionSwitch::ADD_EXPRESSION:
-                return std::make_unique<AddExpression>(std::move(sharedArguments));
+                return std::make_shared<AddExpression>(std::move(sharedArguments));
             case ExpressionSwitch::MUL_EXPRESSION:
-                return std::make_unique<MulExpression>(std::move(sharedArguments));
+                return std::make_shared<MulExpression>(std::move(sharedArguments));
             case ExpressionSwitch::MIN_EXPRESSION:
-                return std::make_unique<MinExpression>(std::move(sharedArguments));
+                return std::make_shared<MinExpression>(std::move(sharedArguments));
             case ExpressionSwitch::MAX_EXPRESSION:
-                return std::make_unique<MaxExpression>(std::move(sharedArguments));
+                return std::make_shared<MaxExpression>(std::move(sharedArguments));
             case ExpressionSwitch::CONCAT_EXPRESSION:
-                return std::make_unique<ConcatExpression>(std::move(sharedArguments));
+                return std::make_shared<ConcatExpression>(std::move(sharedArguments));
             default:
                 throw ParsingException("Unrecognized expression [" + expressionName + "].");
         }
     }
 
-    std::unique_ptr<Expression> Parser::parseTernaryExpression(const std::string& expressionName,
+    std::shared_ptr<Expression> Parser::parseTernaryExpression(const std::string& expressionName,
                                                                ExpressionSwitch expressionSwitch,
-                                                               std::vector<std::unique_ptr<Expression>>&& arguments) {
+                                                               std::vector<std::shared_ptr<Expression>>&& arguments) {
         if (arguments.size() != 3) {
             throw ParsingException::invalidArgumentsCount(expressionName, 3, arguments.size());
         }
@@ -352,11 +357,11 @@ namespace mythtitans::exprl::parser {
 
         switch (expressionSwitch) {
             case ExpressionSwitch::SUBSTR_EXPRESSION:
-                return std::make_unique<SubstrExpression>(std::move(argA), std::move(argB), std::move(argC));
+                return make_substr(std::move(argA), std::move(argB), std::move(argC));
             case ExpressionSwitch::SUBSTRL_EXPRESSION:
-                return std::make_unique<SubstrlExpression>(std::move(argA), std::move(argB), std::move(argC));
+                return make_substrl(std::move(argA), std::move(argB), std::move(argC));
             case ExpressionSwitch::COND_EXPRESSION:
-                return std::make_unique<CondExpression>(std::move(argA), std::move(argB), std::move(argC));
+                return make_cond(std::move(argA), std::move(argB), std::move(argC));
             default:
                 throw ParsingException("Unrecognized expression [" + expressionName + "].");
         };

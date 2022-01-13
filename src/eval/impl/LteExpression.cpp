@@ -8,8 +8,8 @@
 namespace mythtitans::exprl::eval::impl {
 
     LteExpression::LteExpression(std::shared_ptr<Expression> operandA, std::shared_ptr<Expression> operandB) {
-        auto eqExpression = std::make_unique<EqExpression>(operandA, operandB);
-        auto ltExpression = std::make_unique<LtExpression>(std::move(operandA), std::move(operandB));
+        auto eqExpression = make_eq(operandA, operandB);
+        auto ltExpression = make_lt(std::move(operandA), std::move(operandB));
         auto params = std::vector<std::shared_ptr<Expression>>{std::move(eqExpression), std::move(ltExpression)};
         expression_ = std::make_unique<OrExpression>(std::move(params));
     }
