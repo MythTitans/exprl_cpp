@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/DivExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -17,7 +19,11 @@ namespace mythtitans::exprl::eval::impl {
         return operandA_->evaluateAsDecimal(context) / operandB_->evaluateAsDecimal(context);
     }
 
-    std::string DivExpression::getExpressionName() const noexcept {
+    std::string DivExpression::getExpressionName() const {
         return mythtitans::exprl::globals::DIV_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> DivExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/LteExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 #include "include/OrExpression.h"
 #include "include/EqExpression.h"
 #include "include/LtExpression.h"
@@ -18,7 +20,11 @@ namespace mythtitans::exprl::eval::impl {
         return expression_->evaluateAsBoolean(context);
     }
 
-    std::string LteExpression::getExpressionName() const noexcept {
+    std::string LteExpression::getExpressionName() const {
         return mythtitans::exprl::globals::LTE_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> LteExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(expression_);
     }
 }

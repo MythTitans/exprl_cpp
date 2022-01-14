@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/MulExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -34,7 +36,11 @@ namespace mythtitans::exprl::eval::impl {
         return product;
     }
 
-    std::string MulExpression::getExpressionName() const noexcept {
+    std::string MulExpression::getExpressionName() const {
         return mythtitans::exprl::globals::MUL_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> MulExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operands_);
     }
 }

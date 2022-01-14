@@ -9,7 +9,7 @@ namespace mythtitans::exprl::eval {
     class EvaluationException : public std::exception {
 
     public:
-        explicit EvaluationException(std::string&& message) noexcept;
+        explicit EvaluationException(std::string&& message);
 
         [[nodiscard]] static EvaluationException booleanEvaluationError(const std::string& operation);
 

@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/SubExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -17,7 +19,11 @@ namespace mythtitans::exprl::eval::impl {
         return operandA_->evaluateAsDecimal(context) - operandB_->evaluateAsDecimal(context);
     }
 
-    std::string SubExpression::getExpressionName() const noexcept {
+    std::string SubExpression::getExpressionName() const {
         return mythtitans::exprl::globals::SUB_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> SubExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

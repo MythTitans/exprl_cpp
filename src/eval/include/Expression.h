@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <string>
+#include <unordered_set>
 
 #include "Context.h"
 
@@ -31,7 +32,9 @@ namespace mythtitans::exprl::eval {
 
         [[nodiscard]] virtual std::string evaluateAsText(const Context& context) const;
 
-        [[nodiscard]] virtual std::string getExpressionName() const noexcept = 0;
+        [[nodiscard]] virtual std::string getExpressionName() const = 0;
+
+        [[nodiscard]] virtual std::unordered_set<std::string> getLiteralVariables() const = 0;
     };
 
 }

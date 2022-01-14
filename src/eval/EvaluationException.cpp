@@ -2,7 +2,7 @@
 
 namespace mythtitans::exprl::eval {
 
-    EvaluationException::EvaluationException(std::string&& message) noexcept: message_(std::move(message)) {
+    EvaluationException::EvaluationException(std::string&& message): message_(std::move(message)) {
     }
 
     const char* EvaluationException::what() const noexcept {

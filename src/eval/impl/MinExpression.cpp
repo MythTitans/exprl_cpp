@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/MinExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -33,7 +35,11 @@ namespace mythtitans::exprl::eval::impl {
         return min;
     }
 
-    std::string MinExpression::getExpressionName() const noexcept {
+    std::string MinExpression::getExpressionName() const {
         return mythtitans::exprl::globals::MIN_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> MinExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operands_);
     }
 }

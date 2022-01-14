@@ -48,8 +48,10 @@ add_library(exprl_cpp OBJECT
         src/eval/impl/SubstrExpression.cpp src/eval/impl/include/SubstrExpression.h
         src/eval/impl/SubstrlExpression.cpp src/eval/impl/include/SubstrlExpression.h
         src/eval/impl/VarExpression.cpp src/eval/impl/include/VarExpression.h
+        src/eval/impl/LiteralVarExpression.cpp src/eval/impl/include/LiteralVarExpression.h
         src/parser/Parser.cpp src/parser/include/Parser.h
-        src/util/StringUtilities.cpp src/util/include/StringUtilities.h)
+        src/util/StringUtilities.cpp src/util/include/StringUtilities.h
+        src/util/ExpressionUtilities.cpp src/util/include/ExpressionUtilities.h)
 
 add_executable(tests test/Doctest.cpp test/ExpressionEvaluatorTest.cpp test/eval/ExpressionTest.cpp test/parser/ParserTest.cpp $<TARGET_OBJECTS:exprl_cpp>)
 

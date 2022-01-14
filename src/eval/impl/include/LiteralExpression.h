@@ -14,7 +14,9 @@ namespace mythtitans::exprl::eval::impl {
 
         [[nodiscard]] bool evaluateAsBoolean(const Context& context) const override;
 
-        [[nodiscard]] std::string getExpressionName() const noexcept override;
+        [[nodiscard]] std::string getExpressionName() const override;
+
+        [[nodiscard]] std::unordered_set<std::string> getLiteralVariables() const override;
 
     private:
         bool operand_;
@@ -29,7 +31,9 @@ namespace mythtitans::exprl::eval::impl {
 
         [[nodiscard]] double evaluateAsDecimal(const Context& context) const override;
 
-        [[nodiscard]] std::string getExpressionName() const noexcept override;
+        [[nodiscard]] std::string getExpressionName() const override;
+
+        [[nodiscard]] std::unordered_set<std::string> getLiteralVariables() const override;
 
     private:
         long operand_;
@@ -42,7 +46,9 @@ namespace mythtitans::exprl::eval::impl {
 
         [[nodiscard]] double evaluateAsDecimal(const Context& context) const override;
 
-        [[nodiscard]] std::string getExpressionName() const noexcept override;
+        [[nodiscard]] std::string getExpressionName() const override;
+
+        [[nodiscard]] std::unordered_set<std::string> getLiteralVariables() const override;
 
     private:
         double operand_;
@@ -55,7 +61,9 @@ namespace mythtitans::exprl::eval::impl {
 
         [[nodiscard]] std::string evaluateAsText(const Context& context) const override;
 
-        [[nodiscard]] std::string getExpressionName() const noexcept override;
+        [[nodiscard]] std::string getExpressionName() const override;
+
+        [[nodiscard]] std::unordered_set<std::string> getLiteralVariables() const override;
 
     private:
         std::string operand_;

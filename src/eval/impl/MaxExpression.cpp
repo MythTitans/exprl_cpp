@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/MaxExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -34,7 +36,11 @@ namespace mythtitans::exprl::eval::impl {
         return max;
     }
 
-    std::string MaxExpression::getExpressionName() const noexcept {
+    std::string MaxExpression::getExpressionName() const {
         return mythtitans::exprl::globals::MAX_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> MaxExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operands_);
     }
 }

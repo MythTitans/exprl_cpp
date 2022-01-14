@@ -2,8 +2,10 @@
 
 #include <utility>
 #include <cmath>
+#include <unordered_set>
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -27,7 +29,11 @@ namespace mythtitans::exprl::eval::impl {
         return str.substr(begin, length);
     }
 
-    std::string SubstrlExpression::getExpressionName() const noexcept {
+    std::string SubstrlExpression::getExpressionName() const {
         return mythtitans::exprl::globals::SUBSTRL_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> SubstrlExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandStr_, operandBegin_, operandLength_);
     }
 }

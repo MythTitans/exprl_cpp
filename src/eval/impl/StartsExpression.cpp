@@ -1,7 +1,9 @@
+#include <unordered_set>
 #include "include/StartsExpression.h"
 
 #include "../../Globals.h"
 #include "../../util/include/StringUtilities.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 using namespace mythtitans::exprl::util;
 
@@ -18,7 +20,11 @@ namespace mythtitans::exprl::eval::impl {
         return starts_with(str, prefix);
     }
 
-    std::string StartsExpression::getExpressionName() const noexcept {
+    std::string StartsExpression::getExpressionName() const {
         return mythtitans::exprl::globals::STARTS_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> StartsExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

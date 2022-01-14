@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_set>
 
 #include "../../include/Expression.h"
 
@@ -17,7 +18,9 @@ namespace mythtitans::exprl::eval::impl {
 
         [[nodiscard]] double evaluateAsDecimal(const Context& context) const override;
 
-        [[nodiscard]] std::string getExpressionName() const noexcept override;
+        [[nodiscard]] std::string getExpressionName() const override;
+
+        [[nodiscard]] std::unordered_set<std::string> getLiteralVariables() const override;
 
     private:
         std::vector<std::shared_ptr<Expression>> operands_;
@@ -27,8 +30,8 @@ namespace mythtitans::exprl::eval::impl {
     inline auto make_mul(std::shared_ptr<Expression> operandA,
                          std::shared_ptr<Expression> operandB,
                          std::shared_ptr<ExpressionType> ... operands) {
-        return std::make_shared<MulExpression>(std::vector<std::shared_ptr<Expression>>(
-                {std::move(operandA), std::move(operandB), std::move(operands)...}));
+        return std::make_shared<MulExpression>(
+                std::vector{std::move(operandA), std::move(operandB), std::move(operands)...});
     }
 
 }

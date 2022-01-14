@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/DebugExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -34,7 +36,11 @@ namespace mythtitans::exprl::eval::impl {
         return result;
     }
 
-    std::string DebugExpression::getExpressionName() const noexcept {
+    std::string DebugExpression::getExpressionName() const {
         return mythtitans::exprl::globals::DEBUG_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> DebugExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandDebugged_, operandDebugLabel_);
     }
 }

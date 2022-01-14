@@ -77,7 +77,7 @@ namespace mythtitans::exprl::parser {
     class ParsingException : public std::exception {
 
     public:
-        explicit ParsingException(std::string&& message) noexcept;
+        explicit ParsingException(std::string&& message);
 
         [[nodiscard]] static ParsingException
         invalidArgumentsCount(const std::string& token, int expectedCount, int actualCount);
@@ -102,11 +102,11 @@ namespace mythtitans::exprl::parser {
 
         TokenNode& addChild(const std::string& token);
 
-        [[nodiscard]] const std::string& getToken() const noexcept;
+        [[nodiscard]] const std::string& getToken() const;
 
-        [[nodiscard]] const std::vector<std::unique_ptr<TokenNode>>& getChildren() const noexcept;
+        [[nodiscard]] const std::vector<std::unique_ptr<TokenNode>>& getChildren() const;
 
-        [[nodiscard]] TokenNode* getParent() const noexcept;
+        [[nodiscard]] TokenNode* getParent() const;
 
     private:
         const std::string token_;

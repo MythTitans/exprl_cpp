@@ -33,6 +33,7 @@
 #include "../eval/impl/include/CondExpression.h"
 #include "../eval/impl/include/ConcatExpression.h"
 #include "../eval/impl/include/DebugExpression.h"
+#include "../eval/impl/include/LiteralVarExpression.h"
 
 using namespace mythtitans::exprl::eval;
 using namespace mythtitans::exprl::eval::impl;
@@ -245,7 +246,7 @@ namespace mythtitans::exprl::parser {
         }
 
         if (std::regex_match(std::cbegin(expression), std::cend(expression), LITERAL_VARIABLE_PATTERN)) {
-            return make_var(make_literal(expression));
+            return make_var(expression);
         }
 
         throw ParsingException("Invalid literal [" + expression + "].");
@@ -367,7 +368,7 @@ namespace mythtitans::exprl::parser {
         };
     }
 
-    ParsingException::ParsingException(std::string&& message) noexcept: message_(std::move(message)) {
+    ParsingException::ParsingException(std::string&& message) : message_(std::move(message)) {
     }
 
     ParsingException ParsingException::invalidArgumentsCount(const std::string& token,
@@ -414,15 +415,15 @@ namespace mythtitans::exprl::parser {
         return *children_.back();
     }
 
-    const std::string& TokenNode::getToken() const noexcept {
+    const std::string& TokenNode::getToken() const {
         return token_;
     }
 
-    const std::vector<std::unique_ptr<TokenNode>>& TokenNode::getChildren() const noexcept {
+    const std::vector<std::unique_ptr<TokenNode>>& TokenNode::getChildren() const {
         return children_;
     }
 
-    TokenNode* TokenNode::getParent() const noexcept {
+    TokenNode* TokenNode::getParent() const {
         return parent_;
     }
 }

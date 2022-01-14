@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/VarExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -23,7 +25,7 @@ namespace mythtitans::exprl::eval::impl {
         return accessVariable(context).asText();
     }
 
-    std::string VarExpression::getExpressionName() const noexcept {
+    std::string VarExpression::getExpressionName() const {
         return mythtitans::exprl::globals::VAR_EXPRESSION;
     }
 
@@ -35,5 +37,9 @@ namespace mythtitans::exprl::eval::impl {
         }
 
         throw EvaluationException("Cannot find variable [" + variableName + "].");
+    }
+
+    std::unordered_set<std::string> VarExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operand_);
     }
 }

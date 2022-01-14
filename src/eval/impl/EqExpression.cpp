@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/EqExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -40,7 +42,11 @@ namespace mythtitans::exprl::eval::impl {
                 "Expression [" + getExpressionName() + "] failed with all combination of known types.");
     }
 
-    std::string EqExpression::getExpressionName() const noexcept {
+    std::string EqExpression::getExpressionName() const {
         return mythtitans::exprl::globals::EQ_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> EqExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

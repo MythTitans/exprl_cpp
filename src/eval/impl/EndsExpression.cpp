@@ -1,7 +1,9 @@
+#include <unordered_set>
 #include "include/EndsExpression.h"
 
 #include "../../Globals.h"
 #include "../../util/include/StringUtilities.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 using namespace mythtitans::exprl::util;
 
@@ -18,7 +20,11 @@ namespace mythtitans::exprl::eval::impl {
         return ends_with(str, suffix);
     }
 
-    std::string EndsExpression::getExpressionName() const noexcept {
+    std::string EndsExpression::getExpressionName() const {
         return mythtitans::exprl::globals::ENDS_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> EndsExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

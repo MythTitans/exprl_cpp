@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/ModExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -14,10 +16,14 @@ namespace mythtitans::exprl::eval::impl {
     }
 
     double ModExpression::evaluateAsDecimal(const Context& context) const {
-        return static_cast<long>(evaluateAsInteger(context));
+        return static_cast<double>(evaluateAsInteger(context));
     }
 
-    std::string ModExpression::getExpressionName() const noexcept {
+    std::string ModExpression::getExpressionName() const {
         return mythtitans::exprl::globals::MOD_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> ModExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

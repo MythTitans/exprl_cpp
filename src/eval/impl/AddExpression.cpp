@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/AddExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -34,7 +36,11 @@ namespace mythtitans::exprl::eval::impl {
         return sum;
     }
 
-    std::string AddExpression::getExpressionName() const noexcept {
+    std::string AddExpression::getExpressionName() const {
         return mythtitans::exprl::globals::ADD_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> AddExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operands_);
     }
 }

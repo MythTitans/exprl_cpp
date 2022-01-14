@@ -2,6 +2,7 @@
 #define EXPRL_CPP_CONDEXPRESSION_H
 
 #include <memory>
+#include <unordered_set>
 
 #include "../../include/Expression.h"
 
@@ -22,7 +23,9 @@ namespace mythtitans::exprl::eval::impl {
 
         [[nodiscard]] std::string evaluateAsText(const Context& context) const override;
 
-        [[nodiscard]] std::string getExpressionName() const noexcept override;
+        [[nodiscard]] std::string getExpressionName() const override;
+
+        [[nodiscard]] std::unordered_set<std::string> getLiteralVariables() const override;
 
     private:
         [[nodiscard]] const std::shared_ptr<Expression>& evaluateCondition(const Context& context) const;

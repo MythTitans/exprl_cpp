@@ -1,18 +1,19 @@
-#ifndef EXPRL_CPP_VAREXPRESSION_H
-#define EXPRL_CPP_VAREXPRESSION_H
+#ifndef EXPRL_CPP_LITERALVAREXPRESSION_H
+#define EXPRL_CPP_LITERALVAREXPRESSION_H
 
 #include <memory>
 #include <unordered_set>
+#include <string>
 
 #include "../../include/Expression.h"
 #include "../../include/Variable.h"
 
 namespace mythtitans::exprl::eval::impl {
 
-    class VarExpression : public Expression {
+    class LiteralVarExpression : public Expression {
 
     public:
-        explicit VarExpression(std::shared_ptr<Expression> operand);
+        explicit LiteralVarExpression(std::string operand);
 
         [[nodiscard]] bool evaluateAsBoolean(const Context& context) const override;
 
@@ -30,13 +31,13 @@ namespace mythtitans::exprl::eval::impl {
         [[nodiscard]] Variable accessVariable(const Context& context) const;
 
     private:
-        std::shared_ptr<Expression> operand_;
+        std::string operand_;
     };
 
-    inline auto make_var(std::shared_ptr<Expression> operand) {
-        return std::make_shared<VarExpression>(std::move(operand));
+    inline auto make_var(std::string operand) {
+        return std::make_shared<LiteralVarExpression>(std::move(operand));
     }
 
 }
 
-#endif //EXPRL_CPP_VAREXPRESSION_H
+#endif //EXPRL_CPP_LITERALVAREXPRESSION_H

@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/ConcatExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -21,7 +23,11 @@ namespace mythtitans::exprl::eval::impl {
         return result;
     }
 
-    std::string ConcatExpression::getExpressionName() const noexcept {
+    std::string ConcatExpression::getExpressionName() const {
         return mythtitans::exprl::globals::CONCAT_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> ConcatExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operands_);
     }
 }

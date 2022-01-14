@@ -1,7 +1,9 @@
+#include <unordered_set>
 #include "include/InExpression.h"
 
 #include "../../Globals.h"
 #include "../../util/include/StringUtilities.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 using namespace mythtitans::exprl::util;
 
@@ -18,7 +20,11 @@ namespace mythtitans::exprl::eval::impl {
         return contains(str, content);
     }
 
-    std::string InExpression::getExpressionName() const noexcept {
+    std::string InExpression::getExpressionName() const {
         return mythtitans::exprl::globals::IN_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> InExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandA_, operandB_);
     }
 }

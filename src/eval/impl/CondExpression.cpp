@@ -1,8 +1,10 @@
 #include "include/CondExpression.h"
 
 #include <utility>
+#include <unordered_set>
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -30,7 +32,7 @@ namespace mythtitans::exprl::eval::impl {
         return evaluateCondition(context)->evaluateAsText(context);
     }
 
-    std::string CondExpression::getExpressionName() const noexcept {
+    std::string CondExpression::getExpressionName() const {
         return mythtitans::exprl::globals::COND_EXPRESSION;
     }
 
@@ -40,5 +42,9 @@ namespace mythtitans::exprl::eval::impl {
         } else {
             return operandElse_;
         }
+    }
+
+    std::unordered_set<std::string> CondExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operandCond_, operandThen_, operandElse_);
     }
 }

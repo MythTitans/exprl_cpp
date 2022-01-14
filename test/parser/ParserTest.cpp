@@ -1,5 +1,7 @@
 #include "doctest/doctest.h"
 
+#include <unordered_set>
+
 #include "../../src/eval/include/Context.h"
 #include "../../src/parser/include/Parser.h"
 
@@ -342,30 +344,65 @@ TEST_CASE("Text literal escape parsing test")
 
 TEST_CASE("Literal variable syntax test")
 {
-    CHECK_NOTHROW(parser.parse("simple"));
-    CHECK_NOTHROW(parser.parse("simple-dash"));
-    CHECK_NOTHROW(parser.parse("simple_underscore"));
-    CHECK_NOTHROW(parser.parse("composed.simple"));
-    CHECK_NOTHROW(parser.parse("composed.simple-dash"));
-    CHECK_NOTHROW(parser.parse("composed.simple_underscore"));
-    CHECK_NOTHROW(parser.parse("composed.composed.simple"));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("simple")));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("simple-dash")));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("simple_underscore")));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("composed.simple")));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("composed.simple-dash")));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("composed.simple_underscore")));
+    CHECK_NOTHROW(static_cast<void>(parser.parse("composed.composed.simple")));
+}
+
+TEST_CASE("Extract expression literal variables")
+{
+    CHECK(parser.parse("true")->getLiteralVariables().empty());
+    CHECK(parser.parse("a")->getLiteralVariables() == std::unordered_set<std::string>{"a"});
+    CHECK(parser.parse("and(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("and(a, or(a, b))")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+
+    CHECK(parser.parse("add(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("and(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("concat(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("cond(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("debug(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("div(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("ends(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("eq(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("gt(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("gte(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("in(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("len(a)")->getLiteralVariables() == std::unordered_set<std::string>{"a"});
+    CHECK(parser.parse("lt(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("lte(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("max(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("min(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("mod(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("mul(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("neq(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("not(a)")->getLiteralVariables() == std::unordered_set<std::string>{"a"});
+    CHECK(parser.parse("or(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("starts(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("sub(a, b)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b"});
+    CHECK(parser.parse("substr(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("substrl(a, b, c)")->getLiteralVariables() == std::unordered_set<std::string>{"a", "b", "c"});
+    CHECK(parser.parse("var(a)")->getLiteralVariables() == std::unordered_set<std::string>{"a"});
 }
 
 TEST_CASE("Invalid expression parsing test")
 {
-    CHECK_THROWS_AS(parser.parse("'test"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("test'"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("("), ParsingException);
-    CHECK_THROWS_AS(parser.parse("(("), ParsingException);
-    CHECK_THROWS_AS(parser.parse(")"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("))"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("()"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("i(2)"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("42a"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("add(1,"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("add(1, 2"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("42'test'"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("'test'42"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("not(true, true)"), ParsingException);
-    CHECK_THROWS_AS(parser.parse("and(true)"), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("'test")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("test'")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("(")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("((")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse(")")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("))")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("()")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("i(2)")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("42a")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("add(1,")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("add(1, 2")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("42'test'")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("'test'42")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("not(true, true)")), ParsingException);
+    CHECK_THROWS_AS(static_cast<void>(parser.parse("and(true)")), ParsingException);
 }

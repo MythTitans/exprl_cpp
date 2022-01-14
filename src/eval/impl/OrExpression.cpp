@@ -1,6 +1,8 @@
+#include <unordered_set>
 #include "include/OrExpression.h"
 
 #include "../../Globals.h"
+#include "../../util/include/ExpressionUtilities.h"
 
 namespace mythtitans::exprl::eval::impl {
 
@@ -21,7 +23,11 @@ namespace mythtitans::exprl::eval::impl {
         return false;
     }
 
-    std::string OrExpression::getExpressionName() const noexcept {
+    std::string OrExpression::getExpressionName() const {
         return mythtitans::exprl::globals::OR_EXPRESSION;
+    }
+
+    std::unordered_set<std::string> OrExpression::getLiteralVariables() const {
+        return util::getLiteralVariables(operands_);
     }
 }
